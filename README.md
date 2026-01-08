@@ -1,4 +1,6 @@
-# Welcome to your Lovable project
+# TrackYoLifts Pro
+
+Quick fun app created with Lovable in 5 min
 
 ## Project info
 
@@ -24,10 +26,10 @@ Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/konzooo/track-yo-lifts-pro.git
 
 # Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+cd track-yo-lifts-pro
 
 # Step 3: Install the necessary dependencies.
 npm i
