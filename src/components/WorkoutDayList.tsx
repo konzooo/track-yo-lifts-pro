@@ -1,0 +1,48 @@
+import { Dumbbell } from 'lucide-react';
+import { WorkoutDay, Exercise, Entry } from '@/lib/types';
+import { WorkoutDayCard } from './WorkoutDayCard';
+
+interface WorkoutDayListProps {
+  workoutDays: WorkoutDay[];
+  exercises: Exercise[];
+  entries: Entry[];
+  onSelectDay: (day: WorkoutDay) => void;
+}
+
+export function WorkoutDayList({ workoutDays, exercises, entries, onSelectDay }: WorkoutDayListProps) {
+  const sortedDays = [...workoutDays].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  return (
+    <div className="min-h-screen bg-background p-4 safe-top safe-bottom">
+      <div className="max-w-lg mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8 pt-4">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-anchor-glow flex items-center justify-center">
+            <Dumbbell className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <h1 className="font-display text-3xl tracking-wide text-foreground">
+            WORKOUTS
+          </h1>
+        </div>
+
+        {/* Workout Days */}
+        <div className="space-y-3">
+          {sortedDays.map((day) => (
+            <WorkoutDayCard
+              key={day.id}
+              workoutDay={day}
+              exercises={exercises.filter(e => e.workoutDayId === day.id)}
+              entries={entries}
+              onClick={() => onSelectDay(day)}
+            />
+          ))}
+        </div>
+
+        {/* Footer hint */}
+        <p className="text-center text-sm text-muted-foreground mt-8">
+          Tap a workout to start logging
+        </p>
+      </div>
+    </div>
+  );
+}
