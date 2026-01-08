@@ -59,6 +59,15 @@ export function updateExercise(data: AppData, exercise: Exercise): AppData {
   return newData;
 }
 
+export function updateEntry(data: AppData, entry: Entry): AppData {
+  const newData = {
+    ...data,
+    entries: data.entries.map((e) => (e.id === entry.id ? entry : e)),
+  };
+  saveAppData(newData);
+  return newData;
+}
+
 export function deleteEntry(data: AppData, entryId: string): AppData {
   const newData = {
     ...data,
@@ -84,4 +93,32 @@ export function getExerciseHistory(entries: Entry[], exerciseId: string): Entry[
 
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+export function addWorkoutDay(data: AppData, name: string): AppData {
+  const maxSortOrder = data.workoutDays.length > 0
+    ? Math.max(...data.workoutDays.map(d => d.sortOrder))
+    : 0;
+  
+  const newWorkoutDay: WorkoutDay = {
+    id: generateId(),
+    name,
+    sortOrder: maxSortOrder + 1,
+  };
+  
+  const newData = {
+    ...data,
+    workoutDays: [...data.workoutDays, newWorkoutDay],
+  };
+  saveAppData(newData);
+  return newData;
+}
+
+export function addExercise(data: AppData, exercise: Exercise): AppData {
+  const newData = {
+    ...data,
+    exercises: [...data.exercises, exercise],
+  };
+  saveAppData(newData);
+  return newData;
 }

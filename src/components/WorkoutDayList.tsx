@@ -1,4 +1,4 @@
-import { Dumbbell } from 'lucide-react';
+import { Dumbbell, Plus } from 'lucide-react';
 import { WorkoutDay, Exercise, Entry } from '@/lib/types';
 import { WorkoutDayCard } from './WorkoutDayCard';
 
@@ -7,9 +7,10 @@ interface WorkoutDayListProps {
   exercises: Exercise[];
   entries: Entry[];
   onSelectDay: (day: WorkoutDay) => void;
+  onAddWorkout: () => void;
 }
 
-export function WorkoutDayList({ workoutDays, exercises, entries, onSelectDay }: WorkoutDayListProps) {
+export function WorkoutDayList({ workoutDays, exercises, entries, onSelectDay, onAddWorkout }: WorkoutDayListProps) {
   const sortedDays = [...workoutDays].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
@@ -36,6 +37,21 @@ export function WorkoutDayList({ workoutDays, exercises, entries, onSelectDay }:
               onClick={() => onSelectDay(day)}
             />
           ))}
+          
+          {/* Add Workout Button */}
+          <button
+            onClick={onAddWorkout}
+            className="w-full text-left group border-2 border-dashed border-border rounded-xl p-4 hover:border-primary transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <span className="font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                Add Workout
+              </span>
+            </div>
+          </button>
         </div>
 
         {/* Footer hint */}

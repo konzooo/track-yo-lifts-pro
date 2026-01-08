@@ -1,4 +1,4 @@
-import { ArrowLeft, Anchor } from 'lucide-react';
+import { ArrowLeft, Anchor, Plus } from 'lucide-react';
 import { WorkoutDay, Exercise, Entry } from '@/lib/types';
 import { ExerciseCard } from './ExerciseCard';
 
@@ -8,9 +8,10 @@ interface ExerciseListProps {
   entries: Entry[];
   onBack: () => void;
   onSelectExercise: (exercise: Exercise) => void;
+  onAddExercise: () => void;
 }
 
-export function ExerciseList({ workoutDay, exercises, entries, onBack, onSelectExercise }: ExerciseListProps) {
+export function ExerciseList({ workoutDay, exercises, entries, onBack, onSelectExercise, onAddExercise }: ExerciseListProps) {
   const sortedExercises = [...exercises].sort((a, b) => a.sortOrder - b.sortOrder);
   const anchorExercises = sortedExercises.filter(e => e.isAnchor);
   const accessoryExercises = sortedExercises.filter(e => !e.isAnchor);
@@ -60,7 +61,7 @@ export function ExerciseList({ workoutDay, exercises, entries, onBack, onSelectE
 
         {/* Accessory Exercises Section */}
         {accessoryExercises.length > 0 && (
-          <div>
+          <div className="mb-6">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
               Accessories
             </h2>
@@ -76,6 +77,21 @@ export function ExerciseList({ workoutDay, exercises, entries, onBack, onSelectE
             </div>
           </div>
         )}
+
+        {/* Add Exercise Button */}
+        <button
+          onClick={onAddExercise}
+          className="w-full text-left group border-2 border-dashed border-border rounded-xl p-4 hover:border-primary transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+            <span className="font-medium text-muted-foreground group-hover:text-primary transition-colors">
+              Add Exercise
+            </span>
+          </div>
+        </button>
       </div>
     </div>
   );

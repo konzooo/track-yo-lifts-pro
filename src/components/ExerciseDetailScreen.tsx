@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft, Pencil, Plus, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Pencil, Plus, TrendingUp, MoreVertical, Trash2, Edit } from 'lucide-react';
 import { Exercise, Entry } from '@/lib/types';
 import { getExerciseHistory, getLatestEntry, generateId } from '@/lib/storage';
 import { EditExerciseModal } from './EditExerciseModal';
+import { EditEntryModal } from './EditEntryModal';
 import { format } from 'date-fns';
 
 interface ExerciseDetailScreenProps {
@@ -10,6 +11,7 @@ interface ExerciseDetailScreenProps {
   entries: Entry[];
   onBack: () => void;
   onSaveEntry: (entry: Entry) => void;
+  onUpdateEntry: (entry: Entry) => void;
   onUpdateExercise: (exercise: Exercise) => void;
   onDeleteEntry: (entryId: string) => void;
 }
@@ -19,11 +21,13 @@ export function ExerciseDetailScreen({
   entries, 
   onBack, 
   onSaveEntry,
+  onUpdateEntry,
   onUpdateExercise,
   onDeleteEntry 
 }: ExerciseDetailScreenProps) {
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [newEntry, setNewEntry] = useState<{
     date: string;
     sets: number;
@@ -90,9 +94,9 @@ export function ExerciseDetailScreen({
       </div>
 
       {/* Content */}
-      <div className="max-w-lg mx-auto p-4 pb-8">
+      <div className="max-w-lg mx-auto p-4 pb-8 flex flex-col min-h-[calc(100vh-80px)]">
         {/* Exercise Info Section */}
-        <div className="mb-6">
+        <div className="mb-6 flex-shrink-0">
           <h1 className="font-display text-3xl tracking-wide text-foreground mb-3">
             {exercise.name.toUpperCase()}
           </h1>
@@ -147,8 +151,8 @@ export function ExerciseDetailScreen({
         </div>
 
         {/* History Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-4 flex-shrink-0">
             <h2 className="text-lg font-semibold text-foreground">History</h2>
             <button
               onClick={handleAddEntry}
@@ -161,19 +165,20 @@ export function ExerciseDetailScreen({
           </div>
 
           {/* History Table */}
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="bg-card border border-border rounded-xl overflow-visible relative flex-1 min-h-0 pb-safe">
             {/* Table Header */}
-            <div className="grid grid-cols-4 gap-2 p-3 bg-secondary/50 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="grid grid-cols-[1fr_80px_80px_80px_40px] gap-2 p-3 bg-secondary/50 text-xs font-medium text-muted-foreground uppercase tracking-wide">
               <div>Date</div>
               <div className="text-center">Sets</div>
               <div className="text-center">Reps</div>
-              <div className="text-right">Weight</div>
+              <div className="text-center">Weight</div>
+              <div></div>
             </div>
 
             {/* New Entry Row */}
             {newEntry && (
               <div className="border-t border-border">
-                <div className="grid grid-cols-4 gap-2 p-3 items-center bg-primary/5">
+                <div className="grid grid-cols-[1fr_80px_80px_80px_40px] gap-2 p-3 items-center bg-primary/5">
                   <input
                     type="date"
                     value={newEntry.date}
@@ -193,16 +198,15 @@ export function ExerciseDetailScreen({
                     onChange={(e) => setNewEntry({ ...newEntry, repsText: e.target.value })}
                     className="bg-secondary border border-border rounded px-2 py-1 text-sm text-foreground text-center w-full"
                   />
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={newEntry.weight}
-                      onChange={(e) => setNewEntry({ ...newEntry, weight: parseFloat(e.target.value) || 0 })}
-                      className="bg-secondary border border-border rounded px-2 py-1 text-sm text-foreground text-right w-full"
-                      min={0}
-                      step={0.5}
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    value={newEntry.weight}
+                    onChange={(e) => setNewEntry({ ...newEntry, weight: parseFloat(e.target.value) || 0 })}
+                    className="bg-secondary border border-border rounded px-2 py-1 text-sm text-foreground text-center w-full"
+                    min={0}
+                    step={0.5}
+                  />
+                  <div></div>
                 </div>
                 <div className="flex gap-2 p-3 bg-primary/5 border-t border-border/50">
                   <button
@@ -230,7 +234,7 @@ export function ExerciseDetailScreen({
               history.map((entry) => (
                 <div
                   key={entry.id}
-                  className="grid grid-cols-4 gap-2 p-3 border-t border-border items-center hover:bg-secondary/30 transition-colors"
+                  className="grid grid-cols-[1fr_80px_80px_80px_40px] gap-2 p-3 border-t border-border items-center hover:bg-secondary/30 transition-colors"
                 >
                   <div className="text-sm text-muted-foreground">
                     {format(new Date(entry.date), 'd MMM')}
@@ -241,9 +245,49 @@ export function ExerciseDetailScreen({
                   <div className="text-sm text-foreground text-center">
                     {entry.repsText}
                   </div>
-                  <div className="text-sm text-foreground text-right">
+                  <div className="text-sm text-foreground text-center">
                     <span className="text-primary font-medium">{entry.weight}</span>
                     <span className="text-muted-foreground ml-0.5">{entry.unit}</span>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <button
+                      onClick={() => setMenuOpenId(menuOpenId === entry.id ? null : entry.id)}
+                      className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {menuOpenId === entry.id && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setMenuOpenId(null)}
+                        />
+                        <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-20 min-w-[120px] overflow-hidden">
+                          <button
+                            onClick={() => {
+                              setEditingEntry(entry);
+                              setMenuOpenId(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-secondary transition-colors flex items-center gap-2"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('Delete this entry?')) {
+                                onDeleteEntry(entry.id);
+                                setMenuOpenId(null);
+                              }
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-secondary transition-colors flex items-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               ))
@@ -252,7 +296,7 @@ export function ExerciseDetailScreen({
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Exercise Modal */}
       {showEditModal && (
         <EditExerciseModal
           exercise={exercise}
@@ -261,6 +305,18 @@ export function ExerciseDetailScreen({
             setShowEditModal(false);
           }}
           onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {/* Edit Entry Modal */}
+      {editingEntry && (
+        <EditEntryModal
+          entry={editingEntry}
+          onSave={(updatedEntry) => {
+            onUpdateEntry(updatedEntry);
+            setEditingEntry(null);
+          }}
+          onClose={() => setEditingEntry(null)}
         />
       )}
     </div>

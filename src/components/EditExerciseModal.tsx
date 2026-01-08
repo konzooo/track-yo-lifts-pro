@@ -10,26 +10,22 @@ const AVAILABLE_TAGS = [
   'Back',
   'Lats',
   'Legs',
-  'Quads',
-  'Hamstrings',
-  'Glutes',
-  'Core',
   'Warmup',
-  'Rear Delts',
-  'Upper Back',
 ];
 
 interface EditExerciseModalProps {
-  exercise: Exercise;
+  exercise: Exercise | null;
+  workoutDayId?: string;
   onSave: (exercise: Exercise) => void;
   onClose: () => void;
 }
 
-export function EditExerciseModal({ exercise, onSave, onClose }: EditExerciseModalProps) {
-  const [name, setName] = useState(exercise.name);
-  const [muscleTags, setMuscleTags] = useState<string[]>(exercise.muscleTags);
-  const [isAnchor, setIsAnchor] = useState(exercise.isAnchor);
-  const [notes, setNotes] = useState(exercise.notes || '');
+export function EditExerciseModal({ exercise, workoutDayId, onSave, onClose }: EditExerciseModalProps) {
+  const isEditing = exercise !== null;
+  const [name, setName] = useState(exercise?.name || '');
+  const [muscleTags, setMuscleTags] = useState<string[]>(exercise?.muscleTags || []);
+  const [isAnchor, setIsAnchor] = useState(exercise?.isAnchor || false);
+  const [notes, setNotes] = useState(exercise?.notes || '');
 
   const handleToggleTag = (tag: string) => {
     setMuscleTags((prev) =>
@@ -39,14 +35,28 @@ export function EditExerciseModal({ exercise, onSave, onClose }: EditExerciseMod
 
   const handleSave = () => {
     if (!name.trim()) return;
+    if (!isEditing && !workoutDayId) return;
     
-    onSave({
-      ...exercise,
-      name: name.trim(),
-      muscleTags,
-      isAnchor,
-      notes: notes.trim() || undefined,
-    });
+    const exerciseData: Exercise = isEditing && exercise
+      ? {
+          ...exercise,
+          name: name.trim(),
+          muscleTags,
+          isAnchor,
+          notes: notes.trim() || undefined,
+        }
+      : {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          workoutDayId: workoutDayId!,
+          name: name.trim(),
+          muscleTags,
+          isAnchor,
+          defaultScheme: '3x8-12',
+          sortOrder: 999,
+          notes: notes.trim() || undefined,
+        };
+    
+    onSave(exerciseData);
   };
 
   return (
@@ -62,7 +72,7 @@ export function EditExerciseModal({ exercise, onSave, onClose }: EditExerciseMod
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-2xl tracking-wide text-foreground">
-            EDIT EXERCISE
+            {isEditing ? 'EDIT EXERCISE' : 'ADD EXERCISE'}
           </h2>
           <button
             onClick={onClose}
@@ -156,11 +166,11 @@ export function EditExerciseModal({ exercise, onSave, onClose }: EditExerciseMod
           </button>
           <button
             onClick={handleSave}
-            disabled={!name.trim()}
+            disabled={!name.trim() || (!isEditing && !workoutDayId)}
             className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Check className="w-5 h-5" />
-            Save Changes
+            {isEditing ? 'Save Changes' : 'Add Exercise'}
           </button>
         </div>
       </div>
