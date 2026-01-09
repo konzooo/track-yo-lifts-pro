@@ -1,8 +1,24 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-<rect width="512" height="512" rx="128" fill="#4f46e5"/>
-<g fill="#ffffff">
-<rect x="140" y="160" width="60" height="192" rx="30"/>
-<rect x="226" y="120" width="60" height="272" rx="30"/>
-<rect x="312" y="160" width="60" height="192" rx="30"/>
-</g>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient matching the app: from-primary to-anchor-glow -->
+    <linearGradient id="appGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2DD4BF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1FA896;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#appGradient)"/>
+  <!-- Lucide Dumbbell icon (Lucide 24x24) - centered on the 512x512 canvas, black -->
+  <!-- Centering math: move (12,12) to (0,0), scale, then move to (256,256). -->
+  <g transform="translate(256 256) scale(9.5) translate(-12 -12)" stroke="#000000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Center connecting line -->
+    <path d="M14.4 14.4 9.6 9.6"/>
+    <!-- Right weight (complex path) -->
+    <path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/>
+    <!-- Right side line -->
+    <path d="m21.5 21.5-1.4-1.4"/>
+    <!-- Left side line -->
+    <path d="M3.9 3.9 2.5 2.5"/>
+    <!-- Left weight (complex path) -->
+    <path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/>
+  </g>
 </svg>
